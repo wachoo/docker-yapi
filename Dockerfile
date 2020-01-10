@@ -2,14 +2,15 @@ FROM node:11-alpine as builder
 
 COPY repositories /etc/apk/repositories
 RUN apk update && apk add --no-cache  git python make openssl tar gcc
-ADD yapi.tgz /home/
-RUN mkdir /api && mv /home/package /api/vendors
-RUN cd /api/vendors && \
-    npm install --production --registry https://registry.npm.taobao.org
+ADD yapi.tar.gz /home/
+RUN ls /home/
+RUN mkdir -p /api/vendors && mv /home/yapi*/* /api/vendors
+RUN ls /api/vendors
+RUN cd /api/vendors && npm install --production --registry https://registry.npm.taobao.org
 
 FROM node:11-alpine
 
-MAINTAINER Ryan Miao
+MAINTAINER wachoo
 ENV TZ="Asia/Shanghai" HOME="/"
 WORKDIR ${HOME}
 

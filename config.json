@@ -1,6 +1,6 @@
 {
    "port": "3001",
-   "adminAccount": "ryan.miao@demo.com",
+   "adminAccount": "wachoo@126.com",
    "db": {
       "servername": "172.18.0.2",
       "DATABASE": "yapi",

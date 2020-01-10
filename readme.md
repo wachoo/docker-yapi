@@ -12,12 +12,16 @@ YApi:  https://github.com/YMFE/yapi/releases
 
 初始化并启动
 ```
-git clone https://github.com/Ryan-Miao/docker-yapi.git
+git clone -b 0.0.1 https://github.com/wachoo/docker-yapi.git
 cd docker-yapi
-bash build.sh 1.5.10
+#bash code_download.sh 1.5.10
+bash code_download_hub.sh 1.8.1
+bash start.sh stop
+bash start.sh remove
 bash start.sh  init-network
 bash start.sh start-mongo
 bash start.sh init-mongo
+bash start.sh build-yapi
 bash start.sh init-yapi
 bash start.sh logs-yapi
 ```
@@ -86,7 +90,8 @@ Edit config.json to change adminAccount
 
 Then
 ```
-sh build.sh 1.5.10
+bash build_git.sh 1.8.1
+# sh code_download.sh 1.5.10
 ```
 
 
@@ -109,12 +114,8 @@ docker run -d -p 3001:3001 --name yapi --net tools-net --ip 172.18.0.3 yapi
 ```
  docker logs --tail 10 yapi
 log: mongodb load success...
-初始化管理员账号成功,账号名："ryan.miao@demo.com"，密码："ymfe.org"
+初始化管理员账号成功,账号名："wachoo@demo.com"，密码："ymfe.org"
 log: 服务已启动，请打开下面链接访问: 
 http://127.0.0.1:3001/
 log: mongodb load success...
 ```
-
-完整部署过程： https://www.cnblogs.com/woshimrf/p/docker-install-yapi.html
-
-
