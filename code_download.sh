@@ -1,6 +1,6 @@
 #!/bin/bash
 
- echo "usage:  sh build.sh  <version>"
+ echo "usage:  sh code_download.sh  <version>"
  echo "yapi的版本：  https://github.com/YMFE/yapi/releases"
  echo "我们将从这里下载：  http://registry.npm.taobao.org/yapi-vendor/download/yapi-vendor-\$1.tgz"
 
@@ -25,5 +25,3 @@ wget -O yapi.tgz http://registry.npm.taobao.org/yapi-vendor/download/yapi-vendor
 
 echo -e "\033[32m build new image \033[0m"
 
-sudo docker build -t yapi .
-sudo docker tag yapi  yapi:$version

@@ -1,14 +1,14 @@
 #!/bin/bash
 
 function init-network(){
-    sudo docker network rm tools-net
-    sudo docker network create --subnet=172.18.0.0/16 tools-net
+    docker network rm tools-net
+    docker network create --subnet=172.18.0.0/16 tools-net
 }
 
 function mk_d(){
  local dir_name=$1
  if [ ! -d $dir_name  ];then
-      sudo mkdir -p $dir_name
+      mkdir -p $dir_name
  else
       echo "dir ${dir_name} exist"
  fi
@@ -17,49 +17,60 @@ function mk_d(){
 
 
 function start-mongo(){
-    mk_d /data/opt/mongodb/data/configdb
-    mk_d /data/opt/mongodb/data/db/
+    mk_d ${HOME}/data/opt/mongodb/data/configdb
+    mk_d ${HOME}/data/opt/mongodb/data/db/
 
-    sudo docker kill mongod
-    sudo docker rm mongod
-    sudo docker run  \
+    docker kill mongod
+    docker rm -f mongod
+    docker run  \
     --name mongod \
     -p 27017:27017  \
-    -v /data/opt/mongodb/data/configdb:/data/configdb/ \
-    -v /data/opt/mongodb/data/db/:/data/db/ \
+    -v ${HOME}/data/opt/mongodb/data/configdb:/data/configdb/ \
+    -v ${HOME}/data/opt/mongodb/data/db/:/data/db/ \
     --net tools-net --ip 172.18.0.2 \
     -d mongo:4 --auth
 }
 
 function init-mongo(){
-    echo "init mongodb account admin and yapi"
-    sudo docker cp  init-mongo.js  mongod:/data
-    sudo docker exec -it mongod mongo admin /data/init-mongo.js
-    echo "inti mongodb done"
+    echo "init mongodb account for admin and yapi"
+    docker cp  init-mongo.js  mongod:/data
+    docker exec -it mongod mongo admin /data/init-mongo.js
+#    docker cp  data/yapi_mongo_data0.js  mongod:/data
+#    docker exec -it mongod mongo admin /data/yapi_mongo_data0.js
+    echo "init mongodb done"
+}
+
+function build-yapi(){
+    echo -e "\033[32m build new image \033[0m"
+    docker build -t yapi .
+    docker tag yapi yapi:$version
+    echo "end yapi server"
 }
 
 function start-yapi(){
     echo "start yapi server"
-    sudo docker run -d -p 3001:3001 --name yapi --net tools-net --ip 172.18.0.3 yapi
+    docker run -d -p 3001:3001 --name yapi --net tools-net --ip 172.18.0.3 yapi
     echo "end yapi server"
 }
 
 function init-yapi(){
     echo "init yapi db and start yapi server"
-    sudo docker run -d -p 3001:3001 --name yapi --net tools-net --ip 172.18.0.3 yapi --initdb
+    docker run -d -p 3001:3001 --name yapi --net tools-net --ip 172.18.0.3 yapi --initdb
     echo "init yapi done"
 }
 
 function logs-yapi(){
-    sudo  docker logs --tail 10 yapi
+     docker logs --tail 10 yapi
 }
 
 function remove(){
-    sudo rm -r /data/opt/mongodb/
+    rm -r ${HOME}/data/opt/mongodb/
 }
 
 function stop(){
-    sudo docker kill mongod yapi && sudo docker rm yapi mongod
+    docker kill mongod yapi
+    docker rm -f mongod
+    docker rm -f yapi
 }
 
 
@@ -86,6 +97,9 @@ case $1 in
        ;;
     init-mongo)
        init-mongo
+       ;;
+    build-yapi)
+       build-yapi
        ;;
     start-yapi)
        start-yapi
