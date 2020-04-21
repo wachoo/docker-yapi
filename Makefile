@@ -51,6 +51,12 @@ start-mongo:
 init-mongo:
 	bash start.sh init-mongo
 
+dump-mongo:
+	bash start.sh dump-mongo
+
+restore-mongo:
+	bash start.sh restore-mongo  /Users/oyo/Documents/20200421.dat/
+
 # yapi
 download-yapi:
 #	sh code_download_hub.sh ${YAPI_VERSION}

@@ -27,6 +27,7 @@ function start-mongo(){
     -p 27017:27017  \
     -v ${HOME}/data/opt/mongodb/data/configdb:/data/configdb/ \
     -v ${HOME}/data/opt/mongodb/data/db/:/data/db/ \
+    -v ${HOME}/data/opt/mongodb/data/backup/:/data/backup/ \
     --net tools-net --ip 172.18.0.2 \
     -d mongo:4 --auth
 }
@@ -38,6 +39,23 @@ function init-mongo(){
 #    docker cp  data/yapi_mongo_data0.js  mongod:/data
 #    docker exec -it mongod mongo admin /data/yapi_mongo_data0.js
     echo "init mongodb done"
+}
+
+function dump-mongo(){
+    echo "backup mongodb account for admin and yapi"
+    docker exec -it mongod sh -c 'exec var=`date +%Y%m%d%H%M` &amp;&amp; mongodump -h localhost --port 27017 -u admin -p amdin123456 -d yapi -o /data/backup/$var_yapi.dat'
+    echo "backup mongodb done"
+}
+
+function restore-mongo(){
+    if [ -n "$1" ]; then
+     local file=$1
+    fi
+    echo "restore mongodb via $file"
+    docker cp $file mongod:/data/backup/
+    echo "restore mongodb account for admin and yapi"
+    docker exec -it mongod sh -c 'exec mongorestore -h localhost --port 27017 -u admin -p amdin123456 -d yapi -o /data/backup/20200421.dat/'
+    echo "restore mongodb done"
 }
 
 function build-yapi(){
@@ -97,6 +115,12 @@ case $1 in
        ;;
     init-mongo)
        init-mongo
+       ;;
+    dump-mongo)
+       dump-mongo
+       ;;
+    restore-mongo)
+       restore-mongo $2
        ;;
     build-yapi)
        build-yapi
